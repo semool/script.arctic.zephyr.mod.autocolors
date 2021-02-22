@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+	<category label="30001">
+		<setting id="start_time" type="time" label="30002" default="08:00"/>
+		<setting id="end_time" type="time" label="30003" default="20:00"/>
+		<setting id="lightmode" type="select" default="Light" label="30006" values="Light|Light Brown" />
+		<setting id="darkmode" type="select" default="SKINDEFAULT" label="30005" values="SKINDEFAULT|Darker|Darkest" />
+		<setting id="debug" type="bool" default="false" label="30004" />
+	</category>
+</settings>
