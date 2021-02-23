@@ -97,6 +97,6 @@ def main():
 if __name__ == '__main__':
    xbmc.log("%s v%s --> Start" % (addonName , addonVersion),level=xbmc.LOGINFO)
    monitor = xbmc.Monitor()
-   while not monitor.waitForAbort(10):
+   while not monitor.waitForAbort(2):
      main()
    xbmc.log("%s v%s --> Stop" % (addonName , addonVersion),level=xbmc.LOGINFO)
