@@ -1,6 +1,4 @@
-﻿import sys
-import os
-import xbmc, xbmcaddon, xbmcvfs
+﻿import xbmc, xbmcaddon, xbmcvfs
 import json
 import xml.etree.ElementTree as ET
 from datetime import datetime as dt
@@ -8,9 +6,6 @@ from datetime import datetime as dt
 addon = xbmcaddon.Addon("service.arctic.zephyr.mod.autocolors")
 addonName = addon.getAddonInfo("name")
 addonVersion = addon.getAddonInfo("version")
-addonProfile = xbmcvfs.translatePath(addon.getAddonInfo("profile"))
-addonPath = xbmcvfs.translatePath(addon.getAddonInfo("path"))
-addonIcon = os.path.join(addonPath, "icon.png")
 
 def main():
 
@@ -24,8 +19,8 @@ def main():
 
       # Check if Screensaver is active
       data = json.dumps({'jsonrpc': '2.0', 'method': 'XBMC.GetInfoBooleans', 'params': { "booleans": ["System.ScreenSaverActive"] }, 'id': 1})
-      result = json.loads(xbmc.executeJSONRPC(data))
       try:
+         result = json.loads(xbmc.executeJSONRPC(data))
          screensaver = result['result']['System.ScreenSaverActive']
          if debug == "true":
             xbmc.log("%s --> Screensaver: %s" % (addonName , screensaver),level=xbmc.LOGINFO)
@@ -48,8 +43,11 @@ def main():
 
          # Check if Skin is active
          data = json.dumps({'jsonrpc': '2.0', 'method': 'Settings.GetSettingValue', 'params': {'setting':'lookandfeel.skin'}, 'id': 1})
-         result = json.loads(xbmc.executeJSONRPC(data))
-         activeskin = result['result']['value']
+         try:
+            result = json.loads(xbmc.executeJSONRPC(data))
+            activeskin = result['result']['value']
+         except:
+            activeskin = False
          if debug == "true":
             xbmc.log("%s --> Active Skin: %s" % (addonName , activeskin),level=xbmc.LOGINFO)
 
@@ -76,8 +74,11 @@ def main():
 
                # Get current active Color Theme
                data = json.dumps({'jsonrpc': '2.0', 'method': 'Settings.GetSettingValue', 'params': {'setting':'lookandfeel.skincolors'}, 'id': 1})
-               result = json.loads(xbmc.executeJSONRPC(data))
-               activecolor = result['result']['value']
+               try:
+                  result = json.loads(xbmc.executeJSONRPC(data))
+                  activecolor = result['result']['value']
+               except:
+                  activecolor = False
                if debug == "true":
                   xbmc.log("%s --> Current Theme Color: %s" % (addonName , activecolor),level=xbmc.LOGINFO)
 
