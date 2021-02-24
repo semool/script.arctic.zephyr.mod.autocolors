@@ -12,22 +12,15 @@ addonProfile = xbmcvfs.translatePath(addon.getAddonInfo("profile"))
 addonPath = xbmcvfs.translatePath(addon.getAddonInfo("path"))
 addonIcon = os.path.join(addonPath, "icon.png")
 
-debug = addon.getSetting("debug")
-start = addon.getSetting("start_time")
-end = addon.getSetting("end_time")
-light = addon.getSetting("lightmode")
-dark = addon.getSetting("darkmode")
-
 def main():
 
-   # Timeframe for Light Theme Color
-   if debug == "true":
-      xbmc.log("%s --> Light Theme Timeframe: %s -> %s" % (addonName , start, end),level=xbmc.LOGINFO)
+   # Get Debug Setting
+   debug = addon.getSetting("debug")
 
-   # When Player not play Video
-   if not xbmc.Player().isPlayingVideo():
+   # When Player not play anything
+   if not xbmc.Player().isPlaying():
       if debug == "true":
-         xbmc.log("%s --> VideoPlayer: %s" % (addonName , xbmc.Player().isPlayingVideo()),level=xbmc.LOGINFO)
+         xbmc.log("%s --> Player: %s" % (addonName , xbmc.Player().isPlaying()),level=xbmc.LOGINFO)
 
       # Check if Screensaver is active
       data = json.dumps({'jsonrpc': '2.0', 'method': 'XBMC.GetInfoBooleans', 'params': { "booleans": ["System.ScreenSaverActive"] }, 'id': 1})
@@ -42,6 +35,16 @@ def main():
             xbmc.log("%s --> Screensaver: Status unknown" % (addonName),level=xbmc.LOGINFO)
 
       if not screensaver:
+
+         # Get Service Settings
+         start = addon.getSetting("start_time")
+         end = addon.getSetting("end_time")
+         light = addon.getSetting("lightmode")
+         dark = addon.getSetting("darkmode")
+
+         # Timeframe for Light Theme Color
+         if debug == "true":
+            xbmc.log("%s --> Light Theme Timeframe: %s -> %s" % (addonName , start, end),level=xbmc.LOGINFO)
 
          # Check if Skin is active
          data = json.dumps({'jsonrpc': '2.0', 'method': 'Settings.GetSettingValue', 'params': {'setting':'lookandfeel.skin'}, 'id': 1})
