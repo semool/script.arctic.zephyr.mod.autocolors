@@ -37,30 +37,42 @@ def main():
 
       if not windowid == 10100:
 
-         # When Player not play anything
-         if not xbmc.Player().isPlaying():
-            if debug == "true":
-               xbmc.log("%s --> Player: %s" % (addonName , xbmc.Player().isPlaying()),level=xbmc.LOGINFO)
+         # Get Service Settings
+         start = addon.getSetting("start_time")
+         end = addon.getSetting("end_time")
+         light = addon.getSetting("lightmode")
+         dark = addon.getSetting("darkmode")
+         player = addon.getSetting("player")
+         saver = addon.getSetting("saver")
 
-            # Check if Screensaver is active
-            data = json.dumps({'jsonrpc': '2.0', 'method': 'XBMC.GetInfoBooleans', 'params': { "booleans": ["System.ScreenSaverActive"] }, 'id': 1})
-            try:
-               result = json.loads(xbmc.executeJSONRPC(data))
-               screensaver = result['result']['System.ScreenSaverActive']
-               if debug == "true":
-                  xbmc.log("%s --> Screensaver: %s" % (addonName , screensaver),level=xbmc.LOGINFO)
-            except:
+         if player == "false":
+            playcheck = xbmc.Player().isPlaying()
+         else:
+            playcheck = False
+         if debug == "true":
+            xbmc.log("%s --> Playercheck: %s" % (addonName , playcheck),level=xbmc.LOGINFO)
+
+         # When Player not play anything
+         if not playcheck:
+
+            if saver == "true":
                screensaver = False
                if debug == "true":
-                  xbmc.log("%s --> Screensaver: Status unknown" % (addonName),level=xbmc.LOGINFO)
+                  xbmc.log("%s --> Screensavercheck: %s" % (addonName , screensaver),level=xbmc.LOGINFO)
+            else:
+               #Check if Screensaver is active
+               data = json.dumps({'jsonrpc': '2.0', 'method': 'XBMC.GetInfoBooleans', 'params': { "booleans": ["System.ScreenSaverActive"] }, 'id': 1})
+               try:
+                  result = json.loads(xbmc.executeJSONRPC(data))
+                  screensaver = result['result']['System.ScreenSaverActive']
+                  if debug == "true":
+                     xbmc.log("%s --> Screensaver Status: %s" % (addonName , screensaver),level=xbmc.LOGINFO)
+               except:
+                  screensaver = False
+                  if debug == "true":
+                     xbmc.log("%s --> Screensaver Status: unknown" % (addonName),level=xbmc.LOGINFO)
 
             if not screensaver:
-
-               # Get Service Settings
-               start = addon.getSetting("start_time")
-               end = addon.getSetting("end_time")
-               light = addon.getSetting("lightmode")
-               dark = addon.getSetting("darkmode")
 
                # Timeframe for Light Theme Color
                if debug == "true":

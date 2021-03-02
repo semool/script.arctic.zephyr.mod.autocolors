@@ -1,20 +1,18 @@
 # Kodi Media Center language file
-# Addon Name: TvTunes
-# Addon id: script.tvtunes
-# Addon Provider: robwebset
+# Addon Name: Arctic: Zephyr - Reloaded - Automatic Day/Night Colors
+# Addon id: service.arctic.zephyr.mod.autocolors
+# Addon Provider: semool
 msgid ""
 msgstr ""
-"Project-Id-Version: XBMC Addons\n"
-"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
-"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Kodi Translation Team\n"
-"Language-Team: German (http://www.transifex.com/projects/p/xbmc-addons/language/de/)\n"
+"Project-Id-Version: \n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: semool\n"
+"Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: de\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgctxt "#30001"
 msgid "General"
@@ -25,8 +23,8 @@ msgid "Start time Light Color Theme"
 msgstr "Startzeit Helles Farb Thema"
 
 msgctxt "#30003"
-msgid "End time Light Color Theme"
-msgstr "Endzeit Helles Farb Thema"
+msgid "Start time Dark Color Theme"
+msgstr "Startzeit Dunkles Farb Thema"
 
 msgctxt "#30004"
 msgid "Debug Mode"
@@ -39,3 +37,15 @@ msgstr "Dunkler Modus Auswahl"
 msgctxt "#30006"
 msgid "Light Mode Select"
 msgstr "Heller Modus Auswahl"
+
+msgctxt "#30007"
+msgid "Allow Theme change while playing media"
+msgstr "Wechsel erlauben wenn Medien wiedergegeben werden"
+
+msgctxt "#30008"
+msgid "Allow Theme change when Screensaver is on"
+msgstr "Wechsel erlauben bei aktivem Bildschirmschoner"
+
+msgctxt "#30009"
+msgid "Advanced"
+msgstr "Erweitert"
