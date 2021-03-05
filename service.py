@@ -12,13 +12,7 @@ def main():
    # Get Debug Setting
    debug = addon.getSetting("debug")
 
-   # Check if Skin is active
-   data = json.dumps({'jsonrpc': '2.0', 'method': 'Settings.GetSettingValue', 'params': {'setting':'lookandfeel.skin'}, 'id': 1})
-   try:
-      result = json.loads(xbmc.executeJSONRPC(data))
-      activeskin = result['result']['value']
-   except:
-      activeskin = False
+   activeskin = xbmc.getSkinDir()
    if debug == "true":
       xbmc.log("%s --> Active Skin: %s" % (addonName , activeskin),level=xbmc.LOGINFO)
 
