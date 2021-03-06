@@ -106,19 +106,21 @@ def main():
                   current_time = datetime.datetime.now().strftime("%H:%M:%S")
                   cachename = addonId + ".timezone"
                   cachedata = cache.get(cachename)
+                  #cachedata = False
                   if cachedata:
                      zonecache = True
                      local_timezone = cachedata
                   else:
                      zonecache = False
                      local_timezone = datetime.datetime.now(datetime.timezone.utc).astimezone().tzinfo
-                     cache.set(cachename, local_timezone)
+                     cache.set(cachename, local_timezone, expiration=datetime.timedelta(hours=12))
 
                   # Calculate Sunrise -> Sunset
                   timecache = False
                   if sunchange == "true":
                      cachename = addonId + "." + location
                      cachedata = cache.get(cachename)
+                     #cachedata = False
                      if cachedata:
                         timecache = True
                         start = cachedata["start"]
@@ -130,7 +132,7 @@ def main():
                         start = sundata["sunrise"].strftime("%H:%M:%S")
                         end = sundata["sunset"].strftime("%H:%M:%S")
                         times = {"start": start, "end": end}
-                        cache.set(cachename, times)
+                        cache.set(cachename, times, expiration=datetime.timedelta(hours=12))
 
                   # Timeframe for Light Theme Color
                   log("Light Theme Timeframe: %s -> %s (%s) [Timecache: %s - Timezonecache: %s]" % (start, end, local_timezone, timecache, zonecache))
@@ -139,12 +141,12 @@ def main():
                   if current_time > start and current_time < end:
                      # Set Light Theme
                      if activecolor != light:
-                        log("Setting Theme Color: %s" % light)
+                        log("Setting Theme Color: %s" % light, force=True)
                         xbmc.executeJSONRPC(json.dumps({"jsonrpc":"2.0","method":"Settings.SetSettingValue","id":1,"params":{"setting":"lookandfeel.skincolors","value":light}}))
                   else:
                      # Set Dark Theme
                      if activecolor != dark:
-                        log("Setting Theme Color: %s" % dark)
+                        log("Setting Theme Color: %s" % dark, force=True)
                         xbmc.executeJSONRPC(json.dumps({"jsonrpc":"2.0","method":"Settings.SetSettingValue","id":1,"params":{"setting":"lookandfeel.skincolors","value":dark}}))
 
 
