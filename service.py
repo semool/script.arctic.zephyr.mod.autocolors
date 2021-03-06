@@ -1,14 +1,18 @@
-﻿import xbmc, xbmcaddon, xbmcvfs
+﻿#!/usr/bin/python
+# coding: utf-8
+
+import xbmc, xbmcaddon, xbmcvfs
 import simplecache
 import json
 import xml.etree.ElementTree as ET
 import datetime
+from resources.lib.utils import *
 from resources.lib.astral import LocationInfo
 from resources.lib.astral.sun import sun
 
-addon = xbmcaddon.Addon("script.arctic.zephyr.mod.autocolors")
+addon = xbmcaddon.Addon()
 addonName = addon.getAddonInfo("name")
-addonId = addon.getAddonInfo('id')
+addonId = addon.getAddonInfo("id")
 addonVersion = addon.getAddonInfo("version")
 cache = simplecache.SimpleCache()
 
@@ -19,8 +23,7 @@ def main():
 
    # Get active skin name
    activeskin = xbmc.getSkinDir()
-   if debug == "true":
-      xbmc.log("%s --> Active Skin: %s" % (addonName, activeskin),level=xbmc.LOGINFO)
+   log("Active Skin: %s" % activeskin)
 
    if activeskin == "skin.arctic.zephyr.mod":
 
@@ -29,11 +32,11 @@ def main():
       try:
          result = json.loads(xbmc.executeJSONRPC(data))
          windowid = result['result']['currentwindow']['id']
+         windowname = result['result']['currentwindow']['label']
       except:
         windowid = False
-      if debug == "true":
-         windowname = result['result']['currentwindow']['label']
-         xbmc.log("%s --> ActiveWindowID: %s (%s)" % (addonName, windowid, windowname),level=xbmc.LOGINFO)
+        windowname = False
+      log("ActiveWindowID: %s (%s)" % (windowid, windowname))
 
       if not windowid == 10100:
 
@@ -53,28 +56,24 @@ def main():
             playcheck = xbmc.Player().isPlaying()
          else:
             playcheck = False
-         if debug == "true":
-            xbmc.log("%s --> Playercheck: %s" % (addonName, playcheck),level=xbmc.LOGINFO)
+         log("Playercheck: %s" % playcheck)
 
          # When Player not play anything
          if not playcheck:
 
             if saver == "true":
                screensaver = False
-               if debug == "true":
-                  xbmc.log("%s --> Screensavercheck: %s" % (addonName, screensaver),level=xbmc.LOGINFO)
+               log("Screensavercheck: %s" % screensaver)
             else:
                #Check if Screensaver is active
                data = json.dumps({'jsonrpc': '2.0', 'method': 'XBMC.GetInfoBooleans', 'params': { "booleans": ["System.ScreenSaverActive"] }, 'id': 1})
                try:
                   result = json.loads(xbmc.executeJSONRPC(data))
                   screensaver = result['result']['System.ScreenSaverActive']
-                  if debug == "true":
-                     xbmc.log("%s --> Screensaver Status: %s" % (addonName, screensaver),level=xbmc.LOGINFO)
+                  log("Screensaver Status: %s" % screensaver)
                except:
                   screensaver = False
-                  if debug == "true":
-                     xbmc.log("%s --> Screensaver Status: unknown" % (addonName),level=xbmc.LOGINFO)
+                  log("Screensaver Status: unknown")
 
             if not screensaver:
 
@@ -83,17 +82,14 @@ def main():
                   skinaddon = xbmcaddon.Addon("skin.arctic.zephyr.mod")
                   skinProfile = xbmcvfs.translatePath(skinaddon.getAddonInfo("profile"))
                   skinSettings = skinProfile + "settings.xml"
-                  if debug == "true":
-                     xbmc.log("%s --> Skin Profile Path: %s" % (addonName, skinSettings),level=xbmc.LOGINFO)
+                  log("Skin Profile Path: %s" % skinSettings)
                   tree = ET.parse(skinSettings)
                   searchsetting = tree.find(".//setting[@id='daynight.autocolor']")
                   autocolor = searchsetting.text
-                  if debug == "true":
-                     xbmc.log("%s --> Autocolor enabled: %s" % (addonName, autocolor),level=xbmc.LOGINFO)
+                  log("Autocolor enabled: %s" % autocolor)
                except:
                   autocolor = "true"
-                  if debug == "true":
-                     xbmc.log("%s --> Autocolor enabled in Fallback Mode: No Skin Setting Found. Disable this Addon to deactivate automatic color switch: %s" % (addonName , autocolor),level=xbmc.LOGINFO)
+                  log("Autocolor enabled in Fallback Mode: No Skin Setting Found. Disable this Addon to deactivate automatic color switch: %s" % autocolor)
 
                if autocolor == "true":
 
@@ -104,8 +100,7 @@ def main():
                      activecolor = result['result']['value']
                   except:
                      activecolor = False
-                  if debug == "true":
-                     xbmc.log("%s --> Current Theme Color: %s" % (addonName, activecolor),level=xbmc.LOGINFO)
+                  log("Current Theme Color: %s" % activecolor)
 
                   # Get current time and timezone
                   current_time = datetime.datetime.now().strftime("%H:%M:%S")
@@ -138,25 +133,24 @@ def main():
                         cache.set(cachename, times)
 
                   # Timeframe for Light Theme Color
-                  if debug == "true":
-                     xbmc.log("%s --> Light Theme Timeframe: %s -> %s (%s) [Timecache: %s - Timezonecache: %s]" % (addonName, start, end, local_timezone, timecache, zonecache),level=xbmc.LOGINFO)
+                  log("Light Theme Timeframe: %s -> %s (%s) [Timecache: %s - Timezonecache: %s]" % (start, end, local_timezone, timecache, zonecache))
 
                   # Check timeframe and switch Theme Color
                   if current_time > start and current_time < end:
                      # Set Light Theme
                      if activecolor != light:
-                        xbmc.log("%s --> Setting Theme Color: %s" % (addonName, light),level=xbmc.LOGINFO)
+                        log("Setting Theme Color: %s" % light)
                         xbmc.executeJSONRPC(json.dumps({"jsonrpc":"2.0","method":"Settings.SetSettingValue","id":1,"params":{"setting":"lookandfeel.skincolors","value":light}}))
                   else:
                      # Set Dark Theme
                      if activecolor != dark:
-                        xbmc.log("%s --> Setting Theme Color: %s" % (addonName, dark),level=xbmc.LOGINFO)
+                        log("Setting Theme Color: %s" % dark)
                         xbmc.executeJSONRPC(json.dumps({"jsonrpc":"2.0","method":"Settings.SetSettingValue","id":1,"params":{"setting":"lookandfeel.skincolors","value":dark}}))
 
 
 if __name__ == '__main__':
-   xbmc.log("%s v%s --> Start" % (addonName, addonVersion),level=xbmc.LOGINFO)
+   log("v%s --> Start" % addonVersion, force=True)
    monitor = xbmc.Monitor()
    while not monitor.waitForAbort(5):
      main()
-   xbmc.log("%s v%s --> Stop" % (addonName, addonVersion),level=xbmc.LOGINFO)
+   log("v%s --> Stop" % addonVersion, force=True)

@@ -1,25 +1,31 @@
+#!/usr/bin/python
+# coding: utf-8
+
+from resources.lib.utils import *
 import xbmc, xbmcgui, xbmcaddon
 from sys import argv
 import requests
 import json
 import simplecache
 
-addon = xbmcaddon.Addon("script.arctic.zephyr.mod.autocolors")
+addon = xbmcaddon.Addon()
 addonName = addon.getAddonInfo("name")
+addonId = addon.getAddonInfo("id")
+addonVersion = addon.getAddonInfo("version")
 debug = addon.getSetting("debug")
 location = addon.getSetting("location")
 Url = 'https://www.yahoo.com/news/_tdnews/api/resource/WeatherSearch;text=%s'
 cache = simplecache.SimpleCache()
 
-# This Code for Location Select is from the addon weather.multi borrowed
+# The original Code for Location Select is from the addon weather.multi borrowed
 def search_location():
    keyboard = xbmc.Keyboard(location, xbmc.getLocalizedString(14024), False)
    keyboard.doModal()
+   dialog = xbmcgui.Dialog()
    if (keyboard.isConfirmed() and keyboard.getText()):
       text = keyboard.getText()
       locs = []
-      if debug == "true":
-         xbmc.log("%s --> searching for location: %s" % (addonName, text),level=xbmc.LOGINFO)
+      log("Searching for location: %s" % text)
       url = Url % text
       cachedata = cache.get(url)
       if cachedata:
@@ -30,10 +36,8 @@ def search_location():
          data = get_data(url)
          cache.set(url, data)
       if data:
-         if debug == "true":
-            xbmc.log("%s --> location data: %s (Cache: %s)" % (addonName, data, usecache),level=xbmc.LOGINFO)
+         log("Location data: %s (Cache: %s)" % (data, usecache))
          locs = data
-         dialog = xbmcgui.Dialog()
          if locs:
             items = []
             for item in locs:
@@ -44,16 +48,13 @@ def search_location():
                addon.setSetting("location", locs[selected]['city'])
                addon.setSettingNumber("latitude", locs[selected]['lat'])
                addon.setSettingNumber("longitude", locs[selected]['lon'])
-               if debug == "true":
-                  xbmc.log("%s --> selected location: %s" % (addonName, locs[selected]),level=xbmc.LOGINFO)
-         else:
-            if debug == "true":
-               xbmc.log("%s --> no locations found" % (addonName),level=xbmc.LOGINFO)
-            dialog.ok(addonName, xbmc.getLocalizedString(284))
+               log("Selected location: %s" % locs[selected])
+      else:
+         log("No locations found", force=True)
+         dialog.ok(addonName, xbmc.getLocalizedString(284))
 
 def get_data(url):
-   if debug == "true":
-      xbmc.log("%s --> get data: %s" % (addonName, url),level=xbmc.LOGINFO)
+   log("Get data: %s" % url)
    headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.72 Safari/537.36'}
    try:
       response = requests.get(url, headers=headers, timeout=10)
