@@ -1,7 +1,11 @@
 <settings>
 	<category label="30001">
-		<setting id="start_time" type="time" label="30002" default="08:00"/>
-		<setting id="end_time" type="time" label="30003" default="20:00"/>
+		<setting id="sunchange" type="bool" label="30010" default="False" />
+		<setting id="location" type="action" action="RunScript(script.arctic.zephyr.mod.autocolors,loc)" label="30013" visible="eq(-1,true)" default="Berlin" />
+		<setting id="latitude" type="text" label="30011" visible="false" default="52.520008" />
+		<setting id="longitude" type="text" label="30012" visible="false" default="13.404954" />
+		<setting id="start_time" type="time" label="30002" visible="eq(-4,false)" default="08:00"/>
+		<setting id="end_time" type="time" label="30003" visible="eq(-5,false)" default="20:00"/>
 		<setting id="lightmode" type="select" default="Light" label="30006" values="Light|Light Brown" />
 		<setting id="darkmode" type="select" default="SKINDEFAULT" label="30005" values="SKINDEFAULT|Darker|Darkest" />
 	</category>

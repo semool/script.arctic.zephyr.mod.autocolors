@@ -49,3 +49,19 @@ msgstr "Wechsel erlauben bei aktivem Bildschirmschoner"
 msgctxt "#30009"
 msgid "Advanced"
 msgstr "Erweitert"
+
+msgctxt "#30010"
+msgid "Switch on Sunrise/Sunset"
+msgstr "Bei Sonnenauf/untergang wechseln"
+
+msgctxt "#30011"
+msgid "Latitude"
+msgstr ""
+
+msgctxt "#30012"
+msgid "Longitude"
+msgstr ""
+
+msgctxt "#30013"
+msgid "Location"
+msgstr "Standort"

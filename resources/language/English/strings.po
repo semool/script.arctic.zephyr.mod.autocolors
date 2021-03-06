@@ -49,3 +49,19 @@ msgstr ""
 msgctxt "#30009"
 msgid "Advanced"
 msgstr ""
+
+msgctxt "#30010"
+msgid "Switch on Sunrise/Sunset"
+msgstr ""
+
+msgctxt "#30011"
+msgid "Latitude"
+msgstr ""
+
+msgctxt "#30012"
+msgid "Longitude"
+msgstr ""
+
+msgctxt "#30013"
+msgid "Location"
+msgstr ""
