@@ -2,12 +2,14 @@ import xbmc, xbmcgui, xbmcaddon
 from sys import argv
 import requests
 import json
+import simplecache
 
 addon = xbmcaddon.Addon("script.arctic.zephyr.mod.autocolors")
 addonName = addon.getAddonInfo("name")
 debug = addon.getSetting("debug")
 location = addon.getSetting("location")
 Url = 'https://www.yahoo.com/news/_tdnews/api/resource/WeatherSearch;text=%s'
+cache = simplecache.SimpleCache()
 
 # This Code for Location Select is from the addon weather.multi borrowed
 def search_location():
@@ -19,10 +21,18 @@ def search_location():
       if debug == "true":
          xbmc.log("%s --> searching for location: %s" % (addonName, text),level=xbmc.LOGINFO)
       url = Url % text
-      data = get_data(url)
+      try:
+         cachedata = cache.get(url)
+         if cachedata:
+            usecache = True
+            data = cachedata
+      except:
+         usecache = False
+         data = get_data(url)
+         cache.set(url, data)
       if data:
          if debug == "true":
-            xbmc.log("%s --> location data: %s" % (addonName, data),level=xbmc.LOGINFO)
+            xbmc.log("%s --> location data: %s (Cache: %s)" % (addonName, data, usecache),level=xbmc.LOGINFO)
          locs = data
          dialog = xbmcgui.Dialog()
          if locs:

@@ -1,4 +1,5 @@
 ﻿import xbmc, xbmcaddon, xbmcvfs
+import simplecache
 import json
 import xml.etree.ElementTree as ET
 import datetime
@@ -8,6 +9,7 @@ from resources.lib.astral.sun import sun
 addon = xbmcaddon.Addon("script.arctic.zephyr.mod.autocolors")
 addonName = addon.getAddonInfo("name")
 addonVersion = addon.getAddonInfo("version")
+cache = simplecache.SimpleCache()
 
 def main():
 
@@ -36,6 +38,7 @@ def main():
 
          # Get Service Settings
          sunchange = addon.getSetting("sunchange")
+         location = addon.getSetting("location")
          latitude = addon.getSetting("latitude")
          longitude = addon.getSetting("longitude")
          start = addon.getSetting("start_time")
@@ -105,14 +108,28 @@ def main():
 
                   # Get current time and timezone
                   current_time = datetime.datetime.now().strftime("%H:%M:%S")
-                  local_timezone = datetime.datetime.now(datetime.timezone.utc).astimezone().tzinfo
+                  try:
+                     cachedata = cache.get("timezone")
+                     if cachedata:
+                        local_timezone = cachedata
+                  except:
+                     local_timezone = datetime.datetime.now(datetime.timezone.utc).astimezone().tzinfo
+                     cache.set("timezone", local_timezone)
 
                   # Calculate Sunrise -> Sunset
                   if sunchange == "true":
-                     city = LocationInfo(latitude=latitude, longitude=longitude)
-                     sundata = sun(city.observer, tzinfo=local_timezone)
-                     start = sundata["sunrise"].strftime("%H:%M:%S")
-                     end = sundata["sunset"].strftime("%H:%M:%S")
+                     try:
+                        cachedata = cache.get(location)
+                        if cachedata:
+                           start = cachedata["start"]
+                           end = cachedata["end"]
+                     except:
+                        city = LocationInfo(latitude=latitude, longitude=longitude)
+                        sundata = sun(city.observer, tzinfo=local_timezone)
+                        start = sundata["sunrise"].strftime("%H:%M:%S")
+                        end = sundata["sunset"].strftime("%H:%M:%S")
+                        times = {"start": start, "end": end}
+                        cache.set(location, times)
 
                   # Timeframe for Light Theme Color
                   if debug == "true":
