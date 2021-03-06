@@ -28,6 +28,7 @@ def search_location():
       log("Searching for location: %s" % text)
       url = Url % text
       cachedata = cache.get(url)
+      #cachedata = False
       if cachedata:
          usecache = True
          data = cachedata
