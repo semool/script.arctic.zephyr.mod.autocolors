@@ -21,12 +21,11 @@ def search_location():
       if debug == "true":
          xbmc.log("%s --> searching for location: %s" % (addonName, text),level=xbmc.LOGINFO)
       url = Url % text
-      try:
-         cachedata = cache.get(url)
-         if cachedata:
-            usecache = True
-            data = cachedata
-      except:
+      cachedata = cache.get(url)
+      if cachedata:
+         usecache = True
+         data = cachedata
+      else:
          usecache = False
          data = get_data(url)
          cache.set(url, data)

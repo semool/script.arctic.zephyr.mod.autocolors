@@ -8,6 +8,7 @@ from resources.lib.astral.sun import sun
 
 addon = xbmcaddon.Addon("script.arctic.zephyr.mod.autocolors")
 addonName = addon.getAddonInfo("name")
+addonId = addon.getAddonInfo('id')
 addonVersion = addon.getAddonInfo("version")
 cache = simplecache.SimpleCache()
 
@@ -108,32 +109,37 @@ def main():
 
                   # Get current time and timezone
                   current_time = datetime.datetime.now().strftime("%H:%M:%S")
-                  try:
-                     cachedata = cache.get("timezone")
-                     if cachedata:
-                        local_timezone = cachedata
-                  except:
+                  cachename = addonId + ".timezone"
+                  cachedata = cache.get(cachename)
+                  if cachedata:
+                     zonecache = True
+                     local_timezone = cachedata
+                  else:
+                     zonecache = False
                      local_timezone = datetime.datetime.now(datetime.timezone.utc).astimezone().tzinfo
-                     cache.set("timezone", local_timezone)
+                     cache.set(cachename, local_timezone)
 
                   # Calculate Sunrise -> Sunset
+                  timecache = False
                   if sunchange == "true":
-                     try:
-                        cachedata = cache.get(location)
-                        if cachedata:
-                           start = cachedata["start"]
-                           end = cachedata["end"]
-                     except:
+                     cachename = addonId + "." + location
+                     cachedata = cache.get(cachename)
+                     if cachedata:
+                        timecache = True
+                        start = cachedata["start"]
+                        end = cachedata["end"]
+                     else:
+                        timecache = False
                         city = LocationInfo(latitude=latitude, longitude=longitude)
                         sundata = sun(city.observer, tzinfo=local_timezone)
                         start = sundata["sunrise"].strftime("%H:%M:%S")
                         end = sundata["sunset"].strftime("%H:%M:%S")
                         times = {"start": start, "end": end}
-                        cache.set(location, times)
+                        cache.set(cachename, times)
 
                   # Timeframe for Light Theme Color
                   if debug == "true":
-                     xbmc.log("%s --> Light Theme Timeframe: %s -> %s (%s)" % (addonName, start, end, local_timezone),level=xbmc.LOGINFO)
+                     xbmc.log("%s --> Light Theme Timeframe: %s -> %s (%s) [Timecache: %s - Timezonecache: %s]" % (addonName, start, end, local_timezone, timecache, zonecache),level=xbmc.LOGINFO)
 
                   # Check timeframe and switch Theme Color
                   if current_time > start and current_time < end:
