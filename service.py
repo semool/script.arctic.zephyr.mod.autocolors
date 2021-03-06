@@ -18,9 +18,6 @@ cache = simplecache.SimpleCache()
 
 def main():
 
-   # Get Debug Setting
-   debug = addon.getSetting("debug")
-
    # Get active skin name
    activeskin = xbmc.getSkinDir()
    log("Active Skin: %s" % activeskin)
