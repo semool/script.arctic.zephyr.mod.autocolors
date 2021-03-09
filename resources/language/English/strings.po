@@ -65,3 +65,11 @@ msgstr ""
 msgctxt "#30013"
 msgid "Location"
 msgstr ""
+
+msgctxt "#30014"
+msgid "Sunrise"
+msgstr ""
+
+msgctxt "#30015"
+msgid "Sunset"
+msgstr ""

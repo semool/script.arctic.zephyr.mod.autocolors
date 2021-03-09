@@ -49,6 +49,11 @@ def search_location():
                addon.setSetting("location", locs[selected]['city'])
                addon.setSettingNumber("latitude", locs[selected]['lat'])
                addon.setSettingNumber("longitude", locs[selected]['lon'])
+
+               times = suntimes(locs[selected]['city'],locs[selected]['lat'],locs[selected]['lon'])
+               addon.setSetting("start_time_sun", times["start"])
+               addon.setSetting("end_time_sun", times["end"])
+
                log("Selected location: %s" % locs[selected])
       else:
          log("No locations found", force=True)

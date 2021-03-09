@@ -2,19 +2,15 @@
 # coding: utf-8
 
 import xbmc, xbmcaddon, xbmcvfs
-import simplecache
 import json
 import xml.etree.ElementTree as ET
 import datetime
 from resources.lib.utils import *
-from resources.lib.astral import LocationInfo
-from resources.lib.astral.sun import sun
 
 addon = xbmcaddon.Addon()
 addonName = addon.getAddonInfo("name")
 addonId = addon.getAddonInfo("id")
 addonVersion = addon.getAddonInfo("version")
-cache = simplecache.SimpleCache()
 
 def main():
 
@@ -98,40 +94,20 @@ def main():
                activecolor = False
             log("Current Theme Color: %s" % activecolor)
 
-            # Get current time and timezone
+            # Get current time
             current_time = datetime.datetime.now().strftime("%H:%M:%S")
-            cachename = addonId + ".timezone"
-            cachedata = cache.get(cachename)
-            #cachedata = False
-            if cachedata:
-               zonecache = True
-               local_timezone = cachedata
-            else:
-               zonecache = False
-               local_timezone = datetime.datetime.now(datetime.timezone.utc).astimezone().tzinfo
-               cache.set(cachename, local_timezone, expiration=datetime.timedelta(hours=12))
 
             # Calculate Sunrise -> Sunset
-            timecache = False
             if sunchange == "true":
-               cachename = addonId + "." + location
-               cachedata = cache.get(cachename)
-               #cachedata = False
-               if cachedata:
-                  timecache = True
-                  start = cachedata["start"]
-                  end = cachedata["end"]
-               else:
-                  timecache = False
-                  city = LocationInfo(latitude=latitude, longitude=longitude)
-                  sundata = sun(city.observer, tzinfo=local_timezone)
-                  start = sundata["sunrise"].strftime("%H:%M:%S")
-                  end = sundata["sunset"].strftime("%H:%M:%S")
-                  times = {"start": start, "end": end}
-                  cache.set(cachename, times, expiration=datetime.timedelta(hours=12))
+               times = suntimes(location,latitude,longitude)
+               if not times["timecache"]:
+                  addon.setSetting("start_time_sun", times["start"])
+                  addon.setSetting("end_time_sun", times["end"])
+            else:
+               times = {"start": start, "end": end, "local_timezone": False, "zonecache": False, "timecache": False}
 
             # Timeframe for Light Theme Color
-            log("Light Theme Timeframe: %s -> %s (%s) [Timecache: %s - Timezonecache: %s]" % (start, end, local_timezone, timecache, zonecache))
+            log("Light Theme Timeframe: %s -> %s (Timezone: %s) [Zonecache: %s, Timecache: %s]" % (times["start"], times["end"], times["local_timezone"], times["zonecache"], times["timecache"]))
 
             # Check timeframe and switch Theme Color
             if current_time > start and current_time < end:
