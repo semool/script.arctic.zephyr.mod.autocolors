@@ -33,18 +33,6 @@ def main():
 
       if not windowid == 10100:
 
-         # Get Service Settings
-         sunchange = addon.getSetting("sunchange")
-         location = addon.getSetting("location")
-         latitude = addon.getSetting("latitude")
-         longitude = addon.getSetting("longitude")
-         start = addon.getSetting("start_time")
-         end = addon.getSetting("end_time")
-         light = addon.getSetting("lightmode")
-         dark = addon.getSetting("darkmode")
-         player = addon.getSetting("player")
-         saver = addon.getSetting("saver")
-
          # Reading skin setting: is autocolor enabled
          try:
             skinaddon = xbmcaddon.Addon("skin.arctic.zephyr.mod")
@@ -61,6 +49,7 @@ def main():
 
          if autocolor == "true":
 
+            player = addon.getSetting("player")
             if player == "false":
                playcheck = xbmc.Player().isPlaying()
             else:
@@ -69,6 +58,7 @@ def main():
             if playcheck:
                return
 
+            saver = addon.getSetting("saver")
             if saver == "true":
                screensaver = False
                log("Screensavercheck: %s" % screensaver)
@@ -94,29 +84,32 @@ def main():
                activecolor = False
             log("Current Theme Color: %s" % activecolor)
 
-            # Get current time
-            current_time = datetime.datetime.now().strftime("%H:%M:%S")
-
             # Calculate Sunrise -> Sunset
+            sunchange = addon.getSetting("sunchange")
             if sunchange == "true":
-               times = suntimes(location,latitude,longitude)
+               times = suntimes(addon.getSetting("location"),addon.getSetting("latitude"),addon.getSetting("longitude"))
                if not times["timecache"]:
                   addon.setSetting("start_time_sun", times["start"])
                   addon.setSetting("end_time_sun", times["end"])
             else:
+               start = addon.getSetting("start_time")
+               end = addon.getSetting("end_time")
                times = {"start": start, "end": end, "local_timezone": False, "zonecache": False, "timecache": False}
 
             # Timeframe for Light Theme Color
             log("Light Theme Timeframe: %s -> %s (Timezone: %s) [Zonecache: %s, Timecache: %s]" % (times["start"], times["end"], times["local_timezone"], times["zonecache"], times["timecache"]))
 
             # Check timeframe and switch Theme Color
-            if current_time > start and current_time < end:
+            current_time = datetime.datetime.now().strftime("%H:%M:%S")
+            if current_time > times["start"] and current_time < times["end"]:
                # Set Light Theme
+               light = addon.getSetting("lightmode")
                if activecolor != light:
                   log("Setting Theme Color: %s" % light, force=True)
                   xbmc.executeJSONRPC(json.dumps({"jsonrpc":"2.0","method":"Settings.SetSettingValue","id":1,"params":{"setting":"lookandfeel.skincolors","value":light}}))
             else:
                # Set Dark Theme
+               dark = addon.getSetting("darkmode")
                if activecolor != dark:
                   log("Setting Theme Color: %s" % dark, force=True)
                   xbmc.executeJSONRPC(json.dumps({"jsonrpc":"2.0","method":"Settings.SetSettingValue","id":1,"params":{"setting":"lookandfeel.skincolors","value":dark}}))
