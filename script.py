@@ -4,15 +4,11 @@
 from resources.lib.utils import *
 import xbmc, xbmcgui, xbmcaddon
 from sys import argv
-import requests
-import json
 import simplecache
 
 addon = xbmcaddon.Addon()
 addonName = addon.getAddonInfo("name")
-addonId = addon.getAddonInfo("id")
-addonVersion = addon.getAddonInfo("version")
-debug = addon.getSetting("debug")
+
 location = addon.getSetting("location")
 Url = 'https://www.yahoo.com/news/_tdnews/api/resource/WeatherSearch;text=%s'
 cache = simplecache.SimpleCache()
@@ -49,25 +45,14 @@ def search_location():
                addon.setSetting("location", locs[selected]['city'])
                addon.setSettingNumber("latitude", locs[selected]['lat'])
                addon.setSettingNumber("longitude", locs[selected]['lon'])
-
+               # Set Timezones in Settings
                times = suntimes(locs[selected]['city'],locs[selected]['lat'],locs[selected]['lon'])
                addon.setSetting("start_time_sun", times["start"])
                addon.setSetting("end_time_sun", times["end"])
-
                log("Selected location: %s" % locs[selected])
       else:
          log("No locations found", force=True)
          dialog.ok(addonName, xbmc.getLocalizedString(284))
-
-def get_data(url):
-   log("Get data: %s" % url)
-   headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.72 Safari/537.36'}
-   try:
-      response = requests.get(url, headers=headers, timeout=10)
-      return response.json()
-   except:
-      return
-
 
 if __name__ == '__main__':
    if len(argv) > 1:

@@ -1,15 +1,11 @@
 ﻿#!/usr/bin/python
 # coding: utf-8
 
-import xbmc, xbmcaddon, xbmcvfs
-import json
-import xml.etree.ElementTree as ET
+import xbmc, xbmcaddon
 import datetime
 from resources.lib.utils import *
 
 addon = xbmcaddon.Addon()
-addonName = addon.getAddonInfo("name")
-addonId = addon.getAddonInfo("id")
 addonVersion = addon.getAddonInfo("version")
 
 def main():
@@ -21,11 +17,10 @@ def main():
    if activeskin == "skin.arctic.zephyr.mod":
 
       # Dont switch when yes/no Dialog is open [id:10100]
-      data = json.dumps({"jsonrpc":"2.0","method":"GUI.GetProperties","params":{"properties":["currentwindow"]},"id":1})
       try:
-         result = json.loads(xbmc.executeJSONRPC(data))
-         windowid = result['result']['currentwindow']['id']
-         windowname = result['result']['currentwindow']['label']
+         dialogcheck = getJsonRPC({"jsonrpc": "2.0","method": "GUI.GetProperties","params": {"properties": ["currentwindow"]},"id": 1})
+         windowid = dialogcheck['result']['currentwindow']['id']
+         windowname = dialogcheck['result']['currentwindow']['label']
       except:
         windowid = False
         windowname = False
@@ -35,11 +30,8 @@ def main():
 
          # Reading skin setting: is autocolor enabled
          try:
-            skinaddon = xbmcaddon.Addon("skin.arctic.zephyr.mod")
-            skinProfile = xbmcvfs.translatePath(skinaddon.getAddonInfo("profile"))
-            skinSettings = skinProfile + "settings.xml"
+            skinSettings, tree = parseSkinSettings("skin.arctic.zephyr.mod")
             log("Skin Profile Path: %s" % skinSettings)
-            tree = ET.parse(skinSettings)
             searchsetting = tree.find(".//setting[@id='daynight.autocolor']")
             autocolor = searchsetting.text
             log("Autocolor enabled: %s" % autocolor)
@@ -64,10 +56,9 @@ def main():
                log("Screensavercheck: %s" % screensaver)
             else:
                #Check if Screensaver is active
-               data = json.dumps({'jsonrpc': '2.0', 'method': 'XBMC.GetInfoBooleans', 'params': { "booleans": ["System.ScreenSaverActive"] }, 'id': 1})
                try:
-                  result = json.loads(xbmc.executeJSONRPC(data))
-                  screensaver = result['result']['System.ScreenSaverActive']
+                  savercheck = getJsonRPC({"jsonrpc": "2.0", "method": "XBMC.GetInfoBooleans", "params": { "booleans": ["System.ScreenSaverActive"] }, "id": 1})
+                  screensaver = savercheck['result']['System.ScreenSaverActive']
                   log("Screensaver Status: %s" % screensaver)
                except:
                   screensaver = False
@@ -76,10 +67,9 @@ def main():
                return
 
             # Get current active Color Theme
-            data = json.dumps({'jsonrpc': '2.0', 'method': 'Settings.GetSettingValue', 'params': {'setting':'lookandfeel.skincolors'}, 'id': 1})
             try:
-               result = json.loads(xbmc.executeJSONRPC(data))
-               activecolor = result['result']['value']
+               colortheme = getJsonRPC({"jsonrpc": "2.0", "method": "Settings.GetSettingValue", "params": {"setting": "lookandfeel.skincolors"}, "id": 1})
+               activecolor = colortheme['result']['value']
             except:
                activecolor = False
             log("Current Theme Color: %s" % activecolor)
@@ -106,13 +96,13 @@ def main():
                light = addon.getSetting("lightmode")
                if activecolor != light:
                   log("Setting Theme Color: %s" % light, force=True)
-                  xbmc.executeJSONRPC(json.dumps({"jsonrpc":"2.0","method":"Settings.SetSettingValue","id":1,"params":{"setting":"lookandfeel.skincolors","value":light}}))
+                  setJsonRPC({"jsonrpc": "2.0","method": "Settings.SetSettingValue","id": 1,"params": {"setting": "lookandfeel.skincolors","value": light}})
             else:
                # Set Dark Theme
                dark = addon.getSetting("darkmode")
                if activecolor != dark:
                   log("Setting Theme Color: %s" % dark, force=True)
-                  xbmc.executeJSONRPC(json.dumps({"jsonrpc":"2.0","method":"Settings.SetSettingValue","id":1,"params":{"setting":"lookandfeel.skincolors","value":dark}}))
+                  setJsonRPC({"jsonrpc": "2.0","method": "Settings.SetSettingValue","id": 1,"params": {"setting": "lookandfeel.skincolors","value": dark}})
 
 
 if __name__ == '__main__':

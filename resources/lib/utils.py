@@ -1,7 +1,10 @@
 #!/usr/bin/python
 # coding: utf-8
 
-import xbmc, xbmcaddon
+import xbmc, xbmcaddon, xbmcvfs
+import requests
+import json
+import xml.etree.ElementTree as ET
 import datetime
 import simplecache
 from resources.lib.astral import LocationInfo
@@ -22,9 +25,28 @@ ERROR = xbmc.LOGERROR
 def log(txt,loglevel=DEBUG,force=False):
    if (addon.getSettingBool('debug') or force) and loglevel not in [WARNING, ERROR]:
       loglevel = INFO
-
    message = u'[%s] %s' % (addonId, txt)
    xbmc.log(msg=message, level=loglevel)
+
+def getJsonRPC(data):
+   try:
+      result = json.loads(xbmc.executeJSONRPC(json.dumps(data)))
+      return result
+   except:
+      return
+
+def setJsonRPC(data):
+   try:
+      xbmc.executeJSONRPC(json.dumps(data))
+   except:
+      pass
+
+def parseSkinSettings(skindir):
+   skinaddon = xbmcaddon.Addon(skindir)
+   skinProfile = xbmcvfs.translatePath(skinaddon.getAddonInfo("profile"))
+   skinSettings = skinProfile + "settings.xml"
+   tree = ET.parse(skinSettings)
+   return skinSettings, tree
 
 def suntimes(location,latitude,longitude):
    cachename = addonId + ".timezone"
@@ -52,5 +74,12 @@ def suntimes(location,latitude,longitude):
       end = sundata["sunset"].strftime("%H:%M:%S")
       times = {"start": start, "end": end, "local_timezone": local_timezone, "zonecache": zonecache, "timecache": False}
       cache.set(cachename, times, expiration=datetime.timedelta(hours=12))
-
    return times
+
+def get_data(url):
+   headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.72 Safari/537.36'}
+   try:
+      response = requests.get(url, headers=headers, timeout=10)
+      return response.json()
+   except:
+      return
