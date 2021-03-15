@@ -7,8 +7,8 @@ import json
 import xml.etree.ElementTree as ET
 import datetime
 import simplecache
-from resources.lib.astral import LocationInfo
-from resources.lib.astral.sun import sun
+from astral import LocationInfo
+from astral.sun import sun
 
 addon = xbmcaddon.Addon()
 addonName = addon.getAddonInfo("name")
