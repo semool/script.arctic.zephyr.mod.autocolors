@@ -16,7 +16,7 @@ def main():
 
    if activeskin == "skin.arctic.zephyr.mod":
 
-      # Dont switch when yes/no Dialog is open [id:10100]
+      # Dont switch when yes/no Dialog is open [id:10100] or Addon Browser [id:10040]
       try:
          dialogcheck = getJsonRPC({"jsonrpc": "2.0","method": "GUI.GetProperties","params": {"properties": ["currentwindow"]},"id": 1})
          windowid = dialogcheck['result']['currentwindow']['id']
@@ -26,7 +26,7 @@ def main():
         windowname = False
       log("ActiveWindowID: %s (%s)" % (windowid, windowname))
 
-      if not windowid == 10100:
+      if not windowid == 10100 and not windowid == 10040:
 
          # Reading skin setting: is autocolor enabled
          try:
