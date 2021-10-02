@@ -1,4 +1,4 @@
-![](https://raw.githubusercontent.com/semool/script.arctic.zephyr.mod.autocolors/master/icon.png)
+![](https://raw.githubusercontent.com/semool/script.arctic.zephyr.mod.autocolors/master/resources/images/icon.png)
 
 ## Arctic: Zephyr - Reloaded - Automatic Day/Night Colors
 
