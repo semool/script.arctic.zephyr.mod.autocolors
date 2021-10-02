@@ -1,6 +1,6 @@
 ![](https://raw.githubusercontent.com/semool/script.arctic.zephyr.mod.autocolors/master/resources/images/icon.png)
 
-## Arctic: Zephyr - Reloaded - Automatic Day/Night Colors
+## Arctic: Zephyr - Reloaded - Automatic Day and Night Colors
 
 Install first: https://github.com/semool/script.module.astral/releases/
 
