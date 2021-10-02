@@ -15,6 +15,7 @@
         <summary lang="en_GB">Automatic time controlled theme color change between Light and Dark</summary>
         <summary lang="de_DE">Automatischer Zeitgesteuerter Skin Farbwechsel zwischen Hell und Dunkel</summary>
         <platform>all</platform>
+        <source>https://github.com/semool/script.arctic.zephyr.mod.autocolors</source>
         <license>GNU GENERAL PUBLIC LICENSE Version 2</license>
         <assets>
             <icon>resources/images/icon.png</icon>
@@ -22,3 +23,4 @@
         </assets>
     </extension>
 </addon>
+
