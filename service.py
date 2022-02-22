@@ -44,6 +44,12 @@ def main():
             player = addon.getSetting("player")
             if player == "false":
                playcheck = xbmc.Player().isPlaying()
+               if playcheck:
+                  pausecheck = getJsonRPC({"jsonrpc": "2.0","method": "Player.GetProperties","params": { "playerid": 1, "properties": ["speed"] },"id": 1})
+                  speedstate = pausecheck['result']['speed']
+                  log("Pausecheck: %s" % speedstate)
+                  if speedstate == 0:
+                     playcheck = False
             else:
                playcheck = False
             log("Playercheck: %s" % playcheck)
