@@ -46,10 +46,13 @@ def main():
                playcheck = xbmc.Player().isPlaying()
                if playcheck:
                   pausecheck = getJsonRPC({"jsonrpc": "2.0","method": "Player.GetProperties","params": { "playerid": 1, "properties": ["speed"] },"id": 1})
-                  speedstate = pausecheck['result']['speed']
-                  log("Pausecheck: %s" % speedstate)
-                  if speedstate == 0:
-                     playcheck = False
+                  try:
+                     speedstate = pausecheck['result']['speed']
+                     log("Pausecheck: %s" % speedstate)
+                     if speedstate == 0:
+                        playcheck = False
+                  except:
+                     pass
             else:
                playcheck = False
             log("Playercheck: %s" % playcheck)
