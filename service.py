@@ -22,35 +22,34 @@ def dialogcheck():
 
 def playercheck():
    player = getSetting(addonId, "player")
+   speedstate = False
    if player == "false":
       playcheck = xbmc.Player().isPlaying()
       if playcheck:
          pausecheck = getJsonRPC({"jsonrpc": "2.0","method": "Player.GetProperties","params": { "playerid": 1, "properties": ["speed"] },"id": 1})
          try:
             speedstate = pausecheck['result']['speed']
-            log("Pausecheck: %s" % speedstate)
             if speedstate == 0:
                playcheck = False
          except:
             pass
    else:
       playcheck = False
-   log("Playercheck: %s" % playcheck)
+   log("Player Check: %s" % playcheck)
+   log("Player Pause Check: %s" % speedstate)
    return playcheck
 
 def screensavercheck():
    saver = getSetting(addonId, "saver")
    if saver == "true":
       screensaver = False
-      log("Screensavercheck: %s" % screensaver)
    else:
       try:
          savercheck = getJsonRPC({"jsonrpc": "2.0", "method": "XBMC.GetInfoBooleans", "params": { "booleans": ["System.ScreenSaverActive"] }, "id": 1})
          screensaver = savercheck['result']['System.ScreenSaverActive']
-         log("Screensaver Status: %s" % screensaver)
       except:
          screensaver = False
-         log("Screensaver Status: unknown")
+   log("Screensaver Check: %s" % screensaver)
    return screensaver
 
 def main():
@@ -92,7 +91,6 @@ def main():
 
    # Calculate Sunrise -> Sunset
    sunchange = getSetting(addonId, "sunchange")
-
    if sunchange == "true":
       location = getSetting(addonId, "location")
       latitude = getSetting(addonId, "latitude")

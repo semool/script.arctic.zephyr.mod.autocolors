@@ -55,6 +55,7 @@ def getSetting(addonDir, setting):
 def suntimes(location,latitude,longitude):
    cachename = addonId + ".timezone"
    cachedata = cache.get(cachename)
+   # Enable for Debug only to force recaching
    #cachedata = False
    if cachedata:
       zonecache = True
@@ -66,6 +67,7 @@ def suntimes(location,latitude,longitude):
 
    cachename = addonId + "." + location
    cachedata = cache.get(cachename)
+   # Enable for Debug only to force recaching
    #cachedata = False
    if cachedata:
       start = cachedata["start"]
