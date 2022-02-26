@@ -41,12 +41,16 @@ def setJsonRPC(data):
    except:
       pass
 
-def parseSkinSettings(skindir):
-   skinaddon = xbmcaddon.Addon(skindir)
-   skinProfile = xbmcvfs.translatePath(skinaddon.getAddonInfo("profile"))
-   skinSettings = skinProfile + "settings.xml"
-   tree = ET.parse(skinSettings)
-   return skinSettings, tree
+def getSetting(addonDir, setting):
+   try:
+      Name = xbmcaddon.Addon(addonDir)
+      Profile = xbmcvfs.translatePath(Name.getAddonInfo("profile"))
+      tree = ET.parse(Profile + "settings.xml")
+      searchsetting = tree.find('.//setting[@id="{value}"]'.format(value=setting))
+      searchsetting = searchsetting.text
+   except:
+      searchsetting = "false"
+   return searchsetting
 
 def suntimes(location,latitude,longitude):
    cachename = addonId + ".timezone"
