@@ -1,10 +1,9 @@
 #!/usr/bin/python
 # coding: utf-8
 
-import xbmc, xbmcaddon, xbmcvfs
+import xbmc, xbmcaddon
 import requests
 import json
-import xml.etree.ElementTree as ET
 import datetime
 import simplecache
 from astral import LocationInfo
@@ -40,17 +39,6 @@ def setJsonRPC(data):
       xbmc.executeJSONRPC(json.dumps(data))
    except:
       pass
-
-def getSetting(addonDir, setting):
-   try:
-      Name = xbmcaddon.Addon(addonDir)
-      Profile = xbmcvfs.translatePath(Name.getAddonInfo("profile"))
-      tree = ET.parse(Profile + "settings.xml")
-      searchsetting = tree.find('.//setting[@id="{value}"]'.format(value=setting))
-      searchsetting = searchsetting.text
-   except:
-      searchsetting = "false"
-   return searchsetting
 
 def suntimes(location,latitude,longitude):
    cachename = addonId + ".timezone"

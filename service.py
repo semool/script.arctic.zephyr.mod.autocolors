@@ -1,13 +1,13 @@
 ﻿#!/usr/bin/python
 # coding: utf-8
 
-import xbmc, xbmcaddon
+import xbmc, xbmcaddon, xbmcvfs
 import datetime
+import xml.etree.ElementTree as ET
 from resources.lib.utils import *
 
 addon = xbmcaddon.Addon()
 addonVersion = addon.getAddonInfo("version")
-addonId = addon.getAddonInfo("id")
 
 def dialogcheck():
    try:
@@ -21,7 +21,7 @@ def dialogcheck():
    return windowid,windowname
 
 def playercheck():
-   player = getSetting(addonId, "player")
+   player = addon.getSetting("player")
    speedstate = False
    if player == "false":
       playcheck = xbmc.Player().isPlaying()
@@ -40,7 +40,7 @@ def playercheck():
    return playcheck
 
 def screensavercheck():
-   saver = getSetting(addonId, "saver")
+   saver = addon.getSetting("saver")
    if saver == "true":
       screensaver = False
    else:
@@ -61,10 +61,18 @@ def main():
       return
 
    # Reading skin setting: is autocolor enabled
-   autocolor = getSetting(activeskin, "daynight.autocolor")
-   log("Autocolor enabled: %s" % autocolor)
-   if autocolor != "true":
-      return
+
+   #autocolor = xbmcaddon.Addon(activeskin).getSetting("daynight.autocolor") # Its not working??? Returns Nothing!!!
+   
+   # And this crashed Kodi with Python = 3.11
+   #SkinPath = xbmcvfs.translatePath(xbmcaddon.Addon(activeskin).getAddonInfo("profile"))
+   #tree = ET.parse(SkinPath + "settings.xml")
+   #root = tree.getroot()
+   #autocolor = root.find('.//setting[@id="daynight.autocolor"]').text
+
+   #log("Autocolor enabled: %s" % autocolor)
+   #if not autocolor:
+   #   return
 
    # Dont switch when yes/no Dialog is open [id:10100] or Addon Browser [id:10040]
    windowid, windowname = dialogcheck()
@@ -90,18 +98,18 @@ def main():
    log("Current Theme Color: %s" % activecolor)
 
    # Calculate Sunrise -> Sunset
-   sunchange = getSetting(addonId, "sunchange")
+   sunchange = addon.getSetting("sunchange")
    if sunchange == "true":
-      location = getSetting(addonId, "location")
-      latitude = getSetting(addonId, "latitude")
-      longitude = getSetting(addonId, "longitude")
+      location = addon.getSetting("location")
+      latitude = addon.getSetting("latitude")
+      longitude = addon.getSetting("longitude")
       times = suntimes(location,latitude,longitude)
       if not times["timecache"]:
          addon.setSetting("start_time_sun", times["start"])
          addon.setSetting("end_time_sun", times["end"])
    else:
-      start = getSetting(addonId, "start_time")
-      end = getSetting(addonId, "end_time")
+      start = addon.getSetting("start_time")
+      end = addon.getSetting("end_time")
       times = {"start": start, "end": end, "local_timezone": False, "zonecache": False, "timecache": False}
 
    # Timeframe for Light Theme Color
@@ -111,13 +119,13 @@ def main():
    current_time = datetime.datetime.now().strftime("%H:%M:%S")
    if current_time > times["start"] and current_time < times["end"]:
       # Set Light Theme
-      light = getSetting(addonId, "lightmode")
+      light = addon.getSetting("lightmode")
       if activecolor != light:
          log("Setting Theme Color: %s" % light, force=True)
          setJsonRPC({"jsonrpc": "2.0","method": "Settings.SetSettingValue","id": 1,"params": {"setting": "lookandfeel.skincolors","value": light}})
    else:
       # Set Dark Theme
-      dark = getSetting(addonId, "darkmode")
+      dark = addon.getSetting("darkmode")
       if activecolor != dark:
          log("Setting Theme Color: %s" % dark, force=True)
          setJsonRPC({"jsonrpc": "2.0","method": "Settings.SetSettingValue","id": 1,"params": {"setting": "lookandfeel.skincolors","value": dark}})
@@ -127,6 +135,7 @@ if __name__ == '__main__':
    log("Version %s is started" % addonVersion, force=True)
    main()
    monitor = xbmc.Monitor()
-   while not monitor.waitForAbort(5):
-     main()
+   while not monitor.abortRequested():
+      monitor.waitForAbort(5)
+      main()
    log("Version %s is stopped" % addonVersion, force=True)
