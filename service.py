@@ -3,11 +3,40 @@
 
 import xbmc, xbmcaddon, xbmcvfs
 import datetime
-import xml.etree.ElementTree as ET
 from resources.lib.utils import *
+from functools import lru_cache, wraps
+from time import monotonic_ns
 
 addon = xbmcaddon.Addon()
 addonVersion = addon.getAddonInfo("version")
+
+def timed_lru_cache(
+    _func=None, *, seconds: int = 600, maxsize: int = 128, typed: bool = False
+):
+    """Extension of functools lru_cache with a timeout
+    Parameters:
+    seconds (int): Timeout in seconds to clear the WHOLE cache, default = 10 minutes
+    maxsize (int): Maximum Size of the Cache
+    typed (bool): Same value of different type will be a different entry
+    """
+    def wrapper_cache(f):
+        f = lru_cache(maxsize=maxsize, typed=typed)(f)
+        f.delta = seconds * 10 ** 9
+        f.expiration = monotonic_ns() + f.delta
+        @wraps(f)
+        def wrapped_f(*args, **kwargs):
+            if monotonic_ns() >= f.expiration:
+                f.cache_clear()
+                f.expiration = monotonic_ns() + f.delta
+            return f(*args, **kwargs)
+        wrapped_f.cache_info = f.cache_info
+        wrapped_f.cache_clear = f.cache_clear
+        return wrapped_f
+    # To allow decorator to be used without arguments
+    if _func is None:
+        return wrapper_cache
+    else:
+        return wrapper_cache(_func)
 
 def dialogcheck():
    try:
@@ -52,6 +81,20 @@ def screensavercheck():
    log("Screensaver Check: %s" % screensaver)
    return screensaver
 
+@timed_lru_cache(seconds=30)
+def GetSkinSetting(activeskin):
+   autocolor = "false"
+   try:
+      with open(xbmcvfs.translatePath(xbmcaddon.Addon(activeskin).getAddonInfo("profile")) + "settings.xml", 'r') as fp:
+         for l_no, line in enumerate(fp):
+            if 'daynight.autocolor' in line:
+               if 'true' in line:
+                  autocolor = "true"
+                  break
+   except:
+      autocolor = "false"
+   return autocolor
+
 def main():
    # Get active skin name
    activeskin = xbmc.getSkinDir()
@@ -61,18 +104,10 @@ def main():
       return
 
    # Reading skin setting: is autocolor enabled
-
-   #autocolor = xbmcaddon.Addon(activeskin).getSetting("daynight.autocolor") # Its not working??? Returns Nothing!!!
-   
-   # And this crashed Kodi with Python = 3.11
-   #SkinPath = xbmcvfs.translatePath(xbmcaddon.Addon(activeskin).getAddonInfo("profile"))
-   #tree = ET.parse(SkinPath + "settings.xml")
-   #root = tree.getroot()
-   #autocolor = root.find('.//setting[@id="daynight.autocolor"]').text
-
-   #log("Autocolor enabled: %s" % autocolor)
-   #if not autocolor:
-   #   return
+   autocolor = GetSkinSetting(activeskin)
+   log("Autocolor enabled: %s" % autocolor)
+   if autocolor != "true":
+      return
 
    # Dont switch when yes/no Dialog is open [id:10100] or Addon Browser [id:10040]
    windowid, windowname = dialogcheck()
