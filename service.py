@@ -90,7 +90,7 @@ def GetSkinSetting(activeskin):
             if 'daynight.autocolor' in line:
                if 'true' in line:
                   autocolor = "true"
-                  break
+               break
    except:
       autocolor = "false"
    return autocolor
