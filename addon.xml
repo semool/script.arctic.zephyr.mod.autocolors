@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="script.arctic.zephyr.mod.autocolors" name="Arctic: Zephyr - Reloaded - Automatic Day and Night Colors" version="2.1.1" provider-name="semool">
+<addon id="script.arctic.zephyr.mod.autocolors" name="Arctic: Zephyr - Reloaded - Automatic Day and Night Colors" version="2.1.2" provider-name="semool">
 	<requires>
-		<import addon="xbmc.gui" version="5.16.0"/>
+		<import addon="xbmc.gui" version="5.15.0"/>
 		<import addon="script.module.simplecache"/>
 		<import addon="script.module.requests"/>
 		<import addon="script.module.astral"/>

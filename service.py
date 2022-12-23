@@ -4,6 +4,7 @@
 import xbmc, xbmcaddon, xbmcvfs
 import datetime
 from resources.lib.utils import *
+#import xml.etree.ElementTree as ET
 from functools import lru_cache, wraps
 from time import monotonic_ns
 
@@ -81,7 +82,7 @@ def screensavercheck():
    log("Screensaver Check: %s" % screensaver)
    return screensaver
 
-@timed_lru_cache(seconds=30)
+@timed_lru_cache(seconds=60)
 def GetSkinSetting(activeskin):
    autocolor = "false"
    try:
@@ -104,7 +105,20 @@ def main():
       return
 
    # Reading skin setting: is autocolor enabled
+   # --------------------------------------------
+   # Its not working??? Kodi20 Returns Nothing!!! Kodi19 Crashed!!!
+   #autocolor = xbmcaddon.Addon(activeskin).getSetting("daynight.autocolor")
+   # --------------------------------------------
+   # And this crashed Kodi with Python = 3.11 and higher
+   #SkinPath = xbmcvfs.translatePath(xbmcaddon.Addon(activeskin).getAddonInfo("profile"))
+   #tree = ET.parse(SkinPath + "settings.xml")
+   #root = tree.getroot()
+   #autocolor = root.find('.//setting[@id="daynight.autocolor"]').text
+   # --------------------------------------------
+   # This is a workaround. Works with Kodi19 and 20
+   # The file will opened new every 60 Seconds (cache)
    autocolor = GetSkinSetting(activeskin)
+   # --------------------------------------------
    log("Autocolor enabled: %s" % autocolor)
    if autocolor != "true":
       return
