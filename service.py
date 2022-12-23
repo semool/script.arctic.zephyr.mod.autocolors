@@ -11,33 +11,24 @@ from time import monotonic_ns
 addon = xbmcaddon.Addon()
 addonVersion = addon.getAddonInfo("version")
 
-def timed_lru_cache(
-    _func=None, *, seconds: int = 600, maxsize: int = 128, typed: bool = False
-):
-    """Extension of functools lru_cache with a timeout
-    Parameters:
-    seconds (int): Timeout in seconds to clear the WHOLE cache, default = 10 minutes
-    maxsize (int): Maximum Size of the Cache
-    typed (bool): Same value of different type will be a different entry
-    """
-    def wrapper_cache(f):
-        f = lru_cache(maxsize=maxsize, typed=typed)(f)
-        f.delta = seconds * 10 ** 9
-        f.expiration = monotonic_ns() + f.delta
-        @wraps(f)
-        def wrapped_f(*args, **kwargs):
-            if monotonic_ns() >= f.expiration:
-                f.cache_clear()
-                f.expiration = monotonic_ns() + f.delta
-            return f(*args, **kwargs)
-        wrapped_f.cache_info = f.cache_info
-        wrapped_f.cache_clear = f.cache_clear
-        return wrapped_f
-    # To allow decorator to be used without arguments
-    if _func is None:
-        return wrapper_cache
-    else:
-        return wrapper_cache(_func)
+def timed_lru_cache(_func=None, *, seconds: int = 600, maxsize: int = 128, typed: bool = False):
+   def wrapper_cache(f):
+      f = lru_cache(maxsize=maxsize, typed=typed)(f)
+      f.delta = seconds * 10 ** 9
+      f.expiration = monotonic_ns() + f.delta
+      @wraps(f)
+      def wrapped_f(*args, **kwargs):
+         if monotonic_ns() >= f.expiration:
+            f.cache_clear()
+            f.expiration = monotonic_ns() + f.delta
+         return f(*args, **kwargs)
+      wrapped_f.cache_info = f.cache_info
+      wrapped_f.cache_clear = f.cache_clear
+      return wrapped_f
+   if _func is None:
+      return wrapper_cache
+   else:
+      return wrapper_cache(_func)
 
 def dialogcheck():
    try:
@@ -82,18 +73,18 @@ def screensavercheck():
    log("Screensaver Check: %s" % screensaver)
    return screensaver
 
-@timed_lru_cache(seconds=60)
+@timed_lru_cache(seconds=20)
 def GetSkinSetting(activeskin):
-   autocolor = "false"
+   autocolor = False
    try:
       with open(xbmcvfs.translatePath(xbmcaddon.Addon(activeskin).getAddonInfo("profile")) + "settings.xml", 'r') as fp:
          for l_no, line in enumerate(fp):
             if 'daynight.autocolor' in line:
                if 'true' in line:
-                  autocolor = "true"
+                  autocolor = True
                break
    except:
-      autocolor = "false"
+      autocolor = False
    return autocolor
 
 def main():
@@ -116,11 +107,9 @@ def main():
    #autocolor = root.find('.//setting[@id="daynight.autocolor"]').text
    # --------------------------------------------
    # This is a workaround. Works with Kodi19 and 20
-   # The file will opened new every 60 Seconds (cache)
    autocolor = GetSkinSetting(activeskin)
-   # --------------------------------------------
    log("Autocolor enabled: %s" % autocolor)
-   if autocolor != "true":
+   if not autocolor:
       return
 
    # Dont switch when yes/no Dialog is open [id:10100] or Addon Browser [id:10040]
