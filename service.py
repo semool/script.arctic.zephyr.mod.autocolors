@@ -101,6 +101,7 @@ def main():
    #autocolor = xbmcaddon.Addon(activeskin).getSetting("daynight.autocolor")
    # --------------------------------------------
    # And this crashed Kodi with Python = 3.11 and higher
+   # Its a confirmed Bug in Python 3.11.x: https://github.com/xbmc/xbmc/issues/22344
    #SkinPath = xbmcvfs.translatePath(xbmcaddon.Addon(activeskin).getAddonInfo("profile"))
    #tree = ET.parse(SkinPath + "settings.xml")
    #root = tree.getroot()
